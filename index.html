@@ -5,1206 +5,433 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gleza — Etsy Analiz Aracı</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --border: #2a2a3a;
-    --accent: #f97316;
-    --accent2: #fb923c;
-    --text: #f0f0f5;
-    --text2: #9090a8;
-    --text3: #606078;
-    --success: #22c55e;
-    --error: #ef4444;
-    --warning: #eab308;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* HEADER */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 32px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--accent);
-  }
-  .logo span { color: var(--text); }
-  .header-badge {
-    font-size: 11px;
-    background: var(--accent);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 600;
-    margin-left: 8px;
-  }
-  .settings-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    padding: 7px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .settings-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* TABS */
-  .tabs-wrapper {
-    padding: 0 32px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-  }
-  .tab {
-    padding: 14px 20px;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    color: var(--text3);
-    font-weight: 500;
-    white-space: nowrap;
-    transition: all 0.2s;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-  .tab:hover { color: var(--text2); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-icon { font-size: 15px; }
-
-  /* MAIN */
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px;
-  }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* SECTION HEADER */
-  .section-header {
-    margin-bottom: 24px;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .section-desc {
-    color: var(--text2);
-    font-size: 13px;
-  }
-
-  /* INPUT CARD */
-  .input-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-  }
-  .input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .input-group:last-child { margin-bottom: 0; }
-  .field-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text2);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .field-wrap { flex: 1; }
-  input[type="text"], textarea, select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]:focus, textarea:focus, select:focus {
-    border-color: var(--accent);
-  }
-  input::placeholder, textarea::placeholder { color: var(--text3); }
-  textarea { resize: vertical; min-height: 80px; }
-  select option { background: var(--surface2); }
-
-  .btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    transition: all 0.2s;
-    white-space: nowrap;
-    align-self: flex-end;
-  }
-  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text2);
-  }
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
-
-  /* RESULTS */
-  .results-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 16px;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  .result-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* SCORE CIRCLE */
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-  .score-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    flex-shrink: 0;
-  }
-  .score-circle.good { background: rgba(34,197,94,0.15); border: 2px solid var(--success); }
-  .score-circle.medium { background: rgba(234,179,8,0.15); border: 2px solid var(--warning); }
-  .score-circle.bad { background: rgba(239,68,68,0.15); border: 2px solid var(--error); }
-  .score-num {
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1;
-  }
-  .score-circle.good .score-num { color: var(--success); }
-  .score-circle.medium .score-num { color: var(--warning); }
-  .score-circle.bad .score-num { color: var(--error); }
-  .score-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
-
-  /* STATS GRID */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .stat-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    text-align: center;
-  }
-  .stat-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
-  .stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
-
-  /* LIST ITEMS */
-  .analysis-list { list-style: none; }
-  .analysis-item {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    color: var(--text2);
-    font-size: 13px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    line-height: 1.5;
-  }
-  .analysis-item:last-child { border-bottom: none; }
-  .item-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-  /* TAG PILLS */
-  .tags-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-  }
-  .tag-pill {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    color: var(--text2);
-  }
-  .tag-pill.good { border-color: var(--success); color: var(--success); }
-  .tag-pill.bad { border-color: var(--error); color: var(--error); }
-  .tag-pill.medium { border-color: var(--warning); color: var(--warning); }
-
-  /* LOADING */
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--text2);
-  }
-  .spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ERROR */
-  .error-box {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid var(--error);
-    border-radius: 8px;
-    padding: 14px 16px;
-    color: var(--error);
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-
-  /* INFO BOX */
-  .info-box {
-    background: rgba(249,115,22,0.08);
-    border: 1px solid rgba(249,115,22,0.3);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--text2);
-    font-size: 12px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    width: 100%;
-    max-width: 480px;
-    margin: 16px;
-  }
-  .modal-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .modal-close {
-    background: none;
-    border: none;
-    color: var(--text3);
-    cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
-  }
-  .modal-field { margin-bottom: 16px; }
-  .modal-desc {
-    font-size: 12px;
-    color: var(--text3);
-    margin-top: 4px;
-  }
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
-
-  /* KEYWORD RESULTS TABLE */
-  .kw-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .kw-table th {
-    text-align: left;
-    padding: 8px 12px;
-    color: var(--text3);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid var(--border);
-  }
-  .kw-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(42,42,58,0.5);
-    color: var(--text2);
-  }
-  .kw-table tr:hover td { background: var(--surface2); }
-  .competition-bar {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    width: 80px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
-  .competition-fill {
-    height: 100%;
-    border-radius: 2px;
-  }
-
-  /* PRODUCT CARDS */
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  .product-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    transition: border-color 0.2s;
-  }
-  .product-card:hover { border-color: var(--accent); }
-  .product-name {
-    font-weight: 600;
-    color: var(--text);
-    font-size: 13px;
-    margin-bottom: 10px;
-    line-height: 1.4;
-  }
-  .product-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .product-price { color: var(--accent); font-weight: 700; font-size: 15px; }
-  .product-sales { color: var(--text3); font-size: 11px; }
-
-  /* DIVIDER */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 16px 0;
-  }
-
-  /* HIDDEN */
-  .hidden { display: none !important; }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .main { padding: 16px; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .product-grid { grid-template-columns: 1fr; }
-    .tabs-wrapper { padding: 0 16px; }
-    .header { padding: 14px 16px; }
-  }
+:root{--bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;--accent:#f97316;--accent2:#fb923c;--text:#f0f0f5;--text2:#9090a8;--text3:#606078;--success:#22c55e;--error:#ef4444;--warning:#eab308;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--accent);}
+.logo span{color:var(--text);}
+.badge{font-size:11px;background:var(--accent);color:white;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:8px;}
+.settings-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.settings-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tabs-wrapper{padding:0 32px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:4px;overflow-x:auto;}
+.tab{padding:14px 20px;border-bottom:2px solid transparent;cursor:pointer;color:var(--text3);font-weight:500;white-space:nowrap;transition:all 0.2s;font-size:13px;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.main{max-width:900px;margin:0 auto;padding:32px;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+.section-desc{color:var(--text2);font-size:13px;margin-bottom:24px;}
+.input-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;}
+.field-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;display:block;}
+input[type=text],textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;margin-bottom:12px;}
+input[type=text]:focus,textarea:focus{border-color:var(--accent);}
+input::placeholder,textarea::placeholder{color:var(--text3);}
+textarea{resize:vertical;min-height:80px;}
+.btn{background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;font-size:13px;transition:all 0.2s;}
+.btn:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-sec{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.btn-sec:hover{border-color:var(--accent);color:var(--accent);background:transparent;}
+.results-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.result-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;}
+.score-row{display:flex;align-items:center;gap:20px;margin-bottom:20px;}
+.score-circle{width:80px;height:80px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Syne',sans-serif;flex-shrink:0;}
+.score-circle.good{background:rgba(34,197,94,0.15);border:2px solid var(--success);}
+.score-circle.medium{background:rgba(234,179,8,0.15);border:2px solid var(--warning);}
+.score-circle.bad{background:rgba(239,68,68,0.15);border:2px solid var(--error);}
+.score-num{font-size:22px;font-weight:800;line-height:1;}
+.score-circle.good .score-num{color:var(--success);}
+.score-circle.medium .score-num{color:var(--warning);}
+.score-circle.bad .score-num{color:var(--error);}
+.score-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
+.stat-value{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
+.list{list-style:none;}
+.list-item{padding:10px 0;border-bottom:1px solid var(--border);color:var(--text2);font-size:13px;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.list-item:last-child{border-bottom:none;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.tag{background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;font-size:11px;color:var(--text2);}
+.tag.good{border-color:var(--success);color:var(--success);}
+.tag.bad{border-color:var(--error);color:var(--error);}
+.tag.medium{border-color:var(--warning);color:var(--warning);}
+.loading{text-align:center;padding:40px;color:var(--text2);}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-box{background:rgba(239,68,68,0.1);border:1px solid var(--error);border-radius:8px;padding:14px 16px;color:var(--error);font-size:13px;margin-bottom:16px;}
+.hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.hl{background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text2);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.info-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;margin:16px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;}
+.modal-desc{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-label{font-size:12px;color:var(--text2);width:90px;}
+.bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;}
+.bar-val{font-size:12px;font-weight:600;width:28px;text-align:right;}
+@media(max-width:600px){.main{padding:16px;}.stats-grid{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}.tabs-wrapper{padding:0 16px;}.header{padding:14px 16px;}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
-  <div style="display:flex;align-items:center;gap:4px;">
+  <div style="display:flex;align-items:center;">
     <div class="logo">gl<span>eza</span></div>
-    <span class="header-badge">BETA</span>
+    <span class="badge">BETA</span>
   </div>
   <button class="settings-btn" onclick="openSettings()">⚙️ Ayarlar</button>
 </div>
 
-<!-- TABS -->
 <div class="tabs-wrapper">
-  <div class="tab active" onclick="switchTab('keyword')" id="tab-keyword">
-    <span class="tab-icon">🔍</span> Keyword Araştırma
-  </div>
-  <div class="tab" onclick="switchTab('listing')" id="tab-listing">
-    <span class="tab-icon">📋</span> Listing SEO Analizi
-  </div>
-  <div class="tab" onclick="switchTab('shop')" id="tab-shop">
-    <span class="tab-icon">🏪</span> Mağaza Sağlık Skoru
-  </div>
-  <div class="tab" onclick="switchTab('ctr')" id="tab-ctr">
-    <span class="tab-icon">📈</span> CTR & Görsel Rehberi
-  </div>
+  <div class="tab active" onclick="switchTab('keyword')" id="tab-keyword">🔍 Keyword Araştırma</div>
+  <div class="tab" onclick="switchTab('listing')" id="tab-listing">📋 Listing SEO</div>
+  <div class="tab" onclick="switchTab('shop')" id="tab-shop">🏪 Mağaza Sağlık</div>
+  <div class="tab" onclick="switchTab('ctr')" id="tab-ctr">📈 CTR Rehberi</div>
+  <div class="tab" onclick="switchTab('revenue')" id="tab-revenue">💰 Kazanç Hesapla</div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- KEYWORD TAB -->
   <div class="tab-content active" id="content-keyword">
-    <div class="section-header">
-      <div class="section-title">Keyword Araştırma</div>
-      <div class="section-desc">Etsy'de bir keyword ara, rekabet durumunu ve fırsat skorunu gör.</div>
-    </div>
+    <div class="section-title">Keyword Araştırma</div>
+    <div class="section-desc">Etsy'de bir keyword yaz, rekabet ve fırsat analizini gör.</div>
     <div class="input-card">
-      <div class="input-group">
-        <div class="field-wrap">
-          <div class="field-label">Keyword</div>
-          <input type="text" id="kw-input" placeholder="örn: minimalist poster, boho wall art..." />
-        </div>
-        <button class="btn" onclick="analyzeKeyword()" id="kw-btn">Analiz Et</button>
-      </div>
+      <label class="field-label">Keyword</label>
+      <input type="text" id="kw-input" placeholder="örn: minimalist poster, boho wall art, digital planner..." />
+      <button class="btn" onclick="analyzeKeyword()" id="kw-btn">Analiz Et →</button>
     </div>
     <div id="kw-results"></div>
   </div>
 
-  <!-- LISTING TAB -->
   <div class="tab-content" id="content-listing">
-    <div class="section-header">
-      <div class="section-title">Listing SEO Analizi</div>
-      <div class="section-desc">Etsy listing URL'sini yapıştır, SEO skoru ve iyileştirme önerileri al.</div>
-    </div>
+    <div class="section-title">Listing SEO Analizi</div>
+    <div class="section-desc">Listing bilgilerini gir, SEO skoru ve öneriler al.</div>
     <div class="input-card">
-      <div class="input-group" style="flex-direction:column;gap:12px;">
-        <div class="field-wrap">
-          <div class="field-label">Listing URL veya ID</div>
-          <input type="text" id="listing-url" placeholder="https://www.etsy.com/listing/123456789/..." />
-        </div>
-        <div style="display:flex;gap:10px;">
-          <div class="field-wrap">
-            <div class="field-label">Ürün Başlığı (manuel gir)</div>
-            <input type="text" id="listing-title" placeholder="Listing başlığını buraya yaz..." />
-          </div>
-        </div>
-        <div class="field-wrap">
-          <div class="field-label">Etiketler (virgülle ayır)</div>
-          <input type="text" id="listing-tags" placeholder="minimalist, wall art, boho, printable..." />
-        </div>
-        <div class="field-wrap">
-          <div class="field-label">Açıklama (ilk 200 karakter)</div>
-          <textarea id="listing-desc" placeholder="Listing açıklamasının ilk kısmını buraya yapıştır..."></textarea>
-        </div>
-        <button class="btn" onclick="analyzeListing()" style="align-self:flex-start;">SEO Analiz Et</button>
-      </div>
+      <label class="field-label">Ürün Başlığı</label>
+      <input type="text" id="lst-title" placeholder="Listing başlığını buraya yaz..." />
+      <label class="field-label">Etiketler (virgülle ayır)</label>
+      <input type="text" id="lst-tags" placeholder="minimalist, wall art, boho, printable poster..." />
+      <label class="field-label">Açıklama</label>
+      <textarea id="lst-desc" placeholder="Listing açıklamasını buraya yapıştır..."></textarea>
+      <label class="field-label">Fiyat ($)</label>
+      <input type="text" id="lst-price" placeholder="örn: 4.99" />
+      <button class="btn" onclick="analyzeListing()">SEO Analiz Et →</button>
     </div>
     <div id="listing-results"></div>
   </div>
 
-  <!-- SHOP TAB -->
   <div class="tab-content" id="content-shop">
-    <div class="section-header">
-      <div class="section-title">Mağaza Sağlık Skoru</div>
-      <div class="section-desc">Etsy mağaza adını gir, kapsamlı bir sağlık analizi al.</div>
-    </div>
+    <div class="section-title">Mağaza Sağlık Skoru</div>
+    <div class="section-desc">Mağaza bilgilerini gir, kapsamlı analiz al.</div>
     <div class="input-card">
-      <div class="input-group">
-        <div class="field-wrap">
-          <div class="field-label">Mağaza Adı</div>
-          <input type="text" id="shop-name" placeholder="örn: BohoArtStudio" />
-        </div>
-        <button class="btn" onclick="analyzeShop()" id="shop-btn">Analiz Et</button>
-      </div>
-      <div style="margin-top:14px;">
-        <div class="field-label">Ek Bilgi (isteğe bağlı)</div>
-        <textarea id="shop-extra" placeholder="Mağaza hakkında bilmemizi istediğin şeyler, hedef kitlen, sattığın ürün türleri..." style="min-height:60px;"></textarea>
-      </div>
+      <label class="field-label">Mağaza Adı</label>
+      <input type="text" id="sh-name" placeholder="örn: BohoArtStudio" />
+      <label class="field-label">Aktif Listing Sayısı</label>
+      <input type="text" id="sh-listings" placeholder="örn: 45" />
+      <label class="field-label">Toplam Satış Sayısı</label>
+      <input type="text" id="sh-sales" placeholder="örn: 230" />
+      <label class="field-label">Ortalama Yorum Puanı</label>
+      <input type="text" id="sh-rating" placeholder="örn: 4.8" />
+      <label class="field-label">Ne Sattığın ve Hedef Kitle</label>
+      <textarea id="sh-extra" placeholder="Ürün türlerin, hedef pazar, niş bilgisi..." style="min-height:60px;"></textarea>
+      <button class="btn" onclick="analyzeShop()">Mağazayı Analiz Et →</button>
     </div>
     <div id="shop-results"></div>
   </div>
 
-  <!-- CTR TAB -->
   <div class="tab-content" id="content-ctr">
-    <div class="section-header">
-      <div class="section-title">CTR & Görsel Optimizasyon Rehberi</div>
-      <div class="section-desc">Ürün bilgilerini gir, tıklama oranını artırmak için kişisel öneriler al.</div>
-    </div>
+    <div class="section-title">CTR & Görsel Optimizasyon</div>
+    <div class="section-desc">Ürün görselini anlat, tıklama oranını artırmak için öneriler al.</div>
     <div class="input-card">
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div class="field-wrap">
-          <div class="field-label">Ürün Türü / Kategorisi</div>
-          <input type="text" id="ctr-type" placeholder="örn: dijital poster, t-shirt, mug, planner..." />
-        </div>
-        <div class="field-wrap">
-          <div class="field-label">Mevcut Thumbnail Açıklaması</div>
-          <textarea id="ctr-thumb" placeholder="Şu anki kapak görselini tanımla: renk, kompozisyon, metin var mı, kaç ürün gösteriyorsun..."></textarea>
-        </div>
-        <div class="field-wrap">
-          <div class="field-label">Hedef Müşteri</div>
-          <input type="text" id="ctr-audience" placeholder="örn: ev dekorasyonu seven 25-40 yaş Amerikalı kadınlar" />
-        </div>
-        <div class="field-wrap">
-          <div class="field-label">Rakip Mağaza (isteğe bağlı)</div>
-          <input type="text" id="ctr-competitor" placeholder="En çok satan rakibinin mağaza adı..." />
-        </div>
-        <button class="btn" onclick="analyzeCTR()" style="align-self:flex-start;">Rehber Oluştur</button>
-      </div>
+      <label class="field-label">Ürün Türü</label>
+      <input type="text" id="ct-type" placeholder="örn: dijital poster, t-shirt, mug, planner..." />
+      <label class="field-label">Mevcut Thumbnail Açıklaması</label>
+      <textarea id="ct-thumb" placeholder="Kapak görselini tanımla: renkler, kompozisyon, metin var mı, arka plan..."></textarea>
+      <label class="field-label">Hedef Müşteri</label>
+      <input type="text" id="ct-audience" placeholder="örn: ev dekorasyonu seven 25-40 yaş Amerikalı kadınlar" />
+      <label class="field-label">Niş / Stil</label>
+      <input type="text" id="ct-niche" placeholder="örn: minimalist, boho, vintage, modern..." />
+      <button class="btn" onclick="analyzeCTR()">Rehber Oluştur →</button>
     </div>
     <div id="ctr-results"></div>
   </div>
 
+  <div class="tab-content" id="content-revenue">
+    <div class="section-title">Kazanç Hesaplayıcı</div>
+    <div class="section-desc">Ürün bilgilerini gir, tahmini kazanç ve büyüme planını öğren.</div>
+    <div class="input-card">
+      <label class="field-label">Ürün Türü</label>
+      <input type="text" id="rv-type" placeholder="örn: dijital poster, POD t-shirt, printable planner..." />
+      <label class="field-label">Satış Fiyatı ($)</label>
+      <input type="text" id="rv-price" placeholder="örn: 4.99" />
+      <label class="field-label">Üretim/Printify Maliyeti ($, dijital için 0 yaz)</label>
+      <input type="text" id="rv-cost" placeholder="örn: 8.50 veya 0" />
+      <label class="field-label">Aylık Tahmini Satış (bilmiyorsan boş bırak)</label>
+      <input type="text" id="rv-sales" placeholder="örn: 50" />
+      <label class="field-label">Aktif Listing Sayısı</label>
+      <input type="text" id="rv-listings" placeholder="örn: 20" />
+      <button class="btn" onclick="analyzeRevenue()">Kazanç Hesapla →</button>
+    </div>
+    <div id="rev-results"></div>
+  </div>
+
 </div>
 
-<!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
-    <div class="modal-title">
-      ⚙️ API Ayarları
-      <button class="modal-close" onclick="closeSettings()">✕</button>
-    </div>
-    <div class="modal-field">
-      <div class="field-label">Claude API Key</div>
-      <input type="text" id="claude-key-input" placeholder="sk-ant-api03-..." />
-      <div class="modal-desc">console.anthropic.com → API Keys</div>
-    </div>
-    <div class="modal-field">
-      <div class="field-label">Etsy API Key</div>
-      <input type="text" id="etsy-key-input" placeholder="dtrvr0y..." />
-      <div class="modal-desc">etsy.com/developers → Manage Apps</div>
-    </div>
+    <div class="modal-title">⚙️ API Ayarları <button class="modal-close" onclick="closeSettings()">✕</button></div>
+    <div class="modal-desc">Claude API key'ini gir. console.anthropic.com → API Keys bölümünden alabilirsin.</div>
+    <label class="field-label">Claude API Key</label>
+    <input type="text" id="claude-key-input" placeholder="sk-ant-api03-..." />
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeSettings()">İptal</button>
+      <button class="btn btn-sec" onclick="closeSettings()">İptal</button>
       <button class="btn" onclick="saveSettings()">Kaydet</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== SETTINGS ====================
-function openSettings() {
-  document.getElementById('claude-key-input').value = localStorage.getItem('gleza_claude_key') || '';
-  document.getElementById('etsy-key-input').value = localStorage.getItem('gleza_etsy_key') || '';
-  document.getElementById('settings-modal').classList.add('active');
-}
-function closeSettings() {
-  document.getElementById('settings-modal').classList.remove('active');
-}
-function saveSettings() {
-  const ck = document.getElementById('claude-key-input').value.trim();
-  const ek = document.getElementById('etsy-key-input').value.trim();
-  if (ck) localStorage.setItem('gleza_claude_key', ck);
-  if (ek) localStorage.setItem('gleza_etsy_key', ek);
-  closeSettings();
-  showToast('✅ Ayarlar kaydedildi');
-}
-function getKeys() {
-  return {
-    claude: localStorage.getItem('gleza_claude_key') || '',
-    etsy: localStorage.getItem('gleza_etsy_key') || ''
-  };
-}
-function checkKeys() {
-  const { claude, etsy } = getKeys();
-  if (!claude) {
-    openSettings();
-    return false;
-  }
-  return true;
+function openSettings(){document.getElementById('claude-key-input').value=localStorage.getItem('gleza_k')||'';document.getElementById('settings-modal').classList.add('active');}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('active');}
+function saveSettings(){const k=document.getElementById('claude-key-input').value.trim();if(k)localStorage.setItem('gleza_k',k);closeSettings();toast('✅ Kaydedildi');}
+function getKey(){return localStorage.getItem('gleza_k')||'';}
+function checkKey(){if(!getKey()){openSettings();return false;}return true;}
+function switchTab(n){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+n).classList.add('active');document.getElementById('content-'+n).classList.add('active');}
+function toast(m){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a1a24;border:1px solid #2a2a3a;color:#f0f0f5;padding:12px 18px;border-radius:8px;font-size:13px;z-index:9999;';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function loading(id){document.getElementById(id).innerHTML='<div class="loading"><div class="spinner"></div><div>Analiz yapılıyor...</div></div>';}
+function err(id,m){document.getElementById(id).innerHTML='<div class="error-box">❌ '+m+'</div>';}
+
+async function claude(prompt){
+  const key=getKey();
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:'Sen dünya çapında en iyi Etsy uzmanısın. Sadece geçerli JSON formatında yanıt ver, başka hiçbir şey yazma.',messages:[{role:'user',content:prompt}]})
+  });
+  if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API hatası: '+res.status);}
+  const d=await res.json();
+  return d.content[0].text;
 }
 
-// ==================== TAB SWITCH ====================
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  document.getElementById('content-' + name).classList.add('active');
+function parse(raw){
+  try{return JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());}
+  catch(e){throw new Error('Sonuç işlenemedi, tekrar dene.');}
 }
 
-// ==================== TOAST ====================
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a1a24;border:1px solid #2a2a3a;color:#f0f0f5;padding:12px 18px;border-radius:8px;font-size:13px;z-index:9999;animation:fadeIn 0.2s;';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+function bar(label,score){
+  const c=score>=70?'var(--success)':score>=40?'var(--warning)':'var(--error)';
+  return `<div class="bar-row"><span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" style="width:${score}%;background:${c};"></div></div><span class="bar-val" style="color:${c};">${score}</span></div>`;
 }
 
-// ==================== LOADING / ERROR ====================
-function showLoading(container) {
-  document.getElementById(container).innerHTML = `
-    <div class="loading">
-      <div class="spinner"></div>
-      <div>Analiz yapılıyor...</div>
+async function analyzeKeyword(){
+  if(!checkKey())return;
+  const kw=document.getElementById('kw-input').value.trim();
+  if(!kw){toast('Keyword girin');return;}
+  loading('kw-results');
+  document.getElementById('kw-btn').disabled=true;
+  try{
+    const raw=await claude(`Etsy keyword analizi yap: "${kw}". Sadece JSON:{"competition_score":0-100,"opportunity_score":0-100,"avg_price_range":"$X-$Y","trend":"Yükselen/Stabil/Düşen","difficulty":"Kolay/Orta/Zor","estimated_monthly_searches":"X-Y bin/ay","best_sub_keywords":["5 alt keyword"],"insights":["4 önemli bilgi Türkçe"],"recommendation":"2-3 cümle öneri Türkçe","top_niches":["3 karlı niş"]}`);
+    const r=parse(raw);
+    const oc=r.opportunity_score>=70?'good':r.opportunity_score>=40?'medium':'bad';
+    const cc=r.competition_score<=40?'good':r.competition_score<=70?'medium':'bad';
+    document.getElementById('kw-results').innerHTML=`
+    <div class="results-card">
+      <div class="result-title">🔍 "${kw}" Analizi</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-value" style="color:${r.opportunity_score>=70?'var(--success)':r.opportunity_score>=40?'var(--warning)':'var(--error)'}">${r.opportunity_score}/100</div><div class="stat-label">Fırsat Skoru</div></div>
+        <div class="stat-box"><div class="stat-value">${r.avg_price_range}</div><div class="stat-label">Fiyat Aralığı</div></div>
+        <div class="stat-box"><div class="stat-value">${r.difficulty}</div><div class="stat-label">Zorluk</div></div>
+      </div>
+      <div class="tags" style="margin-bottom:16px;">
+        <span class="tag ${r.trend==='Yükselen'?'good':r.trend==='Düşen'?'bad':'medium'}">📊 ${r.trend}</span>
+        <span class="tag">🔎 ${r.estimated_monthly_searches}</span>
+        <span class="tag ${cc}">🎯 Rekabet: ${r.competition_score}/100</span>
+      </div>
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">💡 Alt Keyword Önerileri</label>
+      <div class="tags">${(r.best_sub_keywords||[]).map(k=>'<span class="tag">'+k+'</span>').join('')}</div>
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🏆 Karlı Nişler</label>
+      <div class="tags">${(r.top_niches||[]).map(k=>'<span class="tag good">'+k+'</span>').join('')}</div>
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">📌 Önemli Bilgiler</label>
+      <ul class="list">${(r.insights||[]).map(i=>'<li class="list-item"><span>•</span>'+i+'</li>').join('')}</ul>
+      <div class="hr"></div>
+      <div class="hl">🎯 <strong style="color:var(--accent)">Öneri:</strong> ${r.recommendation}</div>
     </div>`;
-}
-function showError(container, msg) {
-  document.getElementById(container).innerHTML = `<div class="error-box">❌ ${msg}</div>`;
-}
-
-// ==================== CLAUDE API ====================
-async function askClaude(prompt, system) {
-  const { claude } = getKeys();
-  if (!claude) throw new Error('Claude API key bulunamadı. Ayarları kontrol edin.');
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': claude,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      system: system || 'Sen Etsy uzmanı bir analistsin. Türkçe yanıt ver. JSON formatında yanıt ver, başka hiçbir şey yazma.',
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'Claude API hatası');
-  }
-  const data = await response.json();
-  return data.content[0].text;
+  }catch(e){err('kw-results',e.message);}
+  document.getElementById('kw-btn').disabled=false;
 }
 
-// ==================== ETSY API ====================
-async function fetchEtsy(endpoint) {
-  const { etsy } = getKeys();
-  if (!etsy) throw new Error('Etsy API key bulunamadı.');
-  
-  const response = await fetch(`https://openapi.etsy.com/v3/application/${endpoint}`, {
-    headers: { 'x-api-key': etsy }
-  });
-  
-  if (!response.ok) throw new Error('Etsy API hatası: ' + response.status);
-  return response.json();
-}
-
-// ==================== KEYWORD ANALYSIS ====================
-async function analyzeKeyword() {
-  if (!checkKeys()) return;
-  const kw = document.getElementById('kw-input').value.trim();
-  if (!kw) { showToast('Keyword girin'); return; }
-
-  showLoading('kw-results');
-  document.getElementById('kw-btn').disabled = true;
-
-  try {
-    // Etsy API'den listing'leri çek
-    let etsyData = null;
-    let listingCount = 0;
-    let avgPrice = 0;
-    let sampleListings = [];
-
-    try {
-      const data = await fetchEtsy(`listings/active?keywords=${encodeURIComponent(kw)}&limit=25&sort_on=score`);
-      listingCount = data.count || 0;
-      if (data.results && data.results.length > 0) {
-        const prices = data.results.filter(l => l.price).map(l => parseFloat(l.price.amount) / parseFloat(l.price.divisor));
-        avgPrice = prices.length > 0 ? (prices.reduce((a,b) => a+b, 0) / prices.length).toFixed(2) : 0;
-        sampleListings = data.results.slice(0, 6).map(l => ({
-          title: l.title,
-          price: l.price ? (parseFloat(l.price.amount) / parseFloat(l.price.divisor)).toFixed(2) : '?',
-          views: l.views || 0,
-          num_favorers: l.num_favorers || 0
-        }));
-        etsyData = { count: listingCount, avgPrice, sampleListings };
-      }
-    } catch(e) {
-      // Etsy API CORS sorunu olabilir, Claude analizi yine de yapılsın
-      etsyData = null;
-    }
-
-    // Claude analizi
-    const prompt = `Etsy keyword analizi yap: "${kw}"
-${etsyData ? `Etsy API verileri: ${listingCount} listing bulundu, ortalama fiyat: $${avgPrice}` : 'Etsy verisi yok, bilgine göre analiz yap.'}
-${sampleListings.length > 0 ? `Örnek listinglar: ${JSON.stringify(sampleListings.slice(0,3))}` : ''}
-
-Şu JSON formatında yanıt ver:
-{
-  "competition_score": 0-100 arası rekabet skoru (düşük = daha az rekabet = iyi),
-  "opportunity_score": 0-100 arası fırsat skoru,
-  "estimated_listings": tahmini listing sayısı (sayı),
-  "avg_price_range": "$X - $Y",
-  "trend": "Yükselen" veya "Stabil" veya "Düşen",
-  "difficulty": "Kolay" veya "Orta" veya "Zor",
-  "best_sub_keywords": ["5 adet alt keyword öner"],
-  "insights": ["3-5 adet önemli insight, Türkçe"],
-  "recommendation": "Bu keyword için genel öneri, Türkçe, 2-3 cümle"
-}`;
-
-    const raw = await askClaude(prompt);
-    let result;
-    try {
-      result = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
-    } catch(e) {
-      throw new Error('Analiz sonucu işlenemedi. Tekrar deneyin.');
-    }
-
-    const oppColor = result.opportunity_score >= 70 ? 'good' : result.opportunity_score >= 40 ? 'medium' : 'bad';
-    const compColor = result.competition_score <= 40 ? 'good' : result.competition_score <= 70 ? 'medium' : 'bad';
-
-    document.getElementById('kw-results').innerHTML = `
-      <div class="results-card">
-        <div class="result-title">🔍 "${kw}" Keyword Analizi</div>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-value" style="color:${result.opportunity_score>=70?'var(--success)':result.opportunity_score>=40?'var(--warning)':'var(--error)'}">${result.opportunity_score}/100</div>
-            <div class="stat-label">Fırsat Skoru</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value">${result.avg_price_range}</div>
-            <div class="stat-label">Fiyat Aralığı</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value">${result.difficulty}</div>
-            <div class="stat-label">Zorluk</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-          <span class="tag-pill ${result.trend==='Yükselen'?'good':result.trend==='Düşen'?'bad':'medium'}">📊 ${result.trend}</span>
-          <span class="tag-pill">~${result.estimated_listings?.toLocaleString() || '?'} listing</span>
-          <span class="tag-pill ${result.competition_score<=40?'good':result.competition_score<=70?'medium':'bad'}">🎯 Rekabet: ${result.competition_score}/100</span>
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:12px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;">💡 Alt Keyword Önerileri</div>
-        <div class="tags-wrap">
-          ${(result.best_sub_keywords||[]).map(k=>`<span class="tag-pill">${k}</span>`).join('')}
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:12px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;">📌 Önemli Bilgiler</div>
-        <ul class="analysis-list">
-          ${(result.insights||[]).map(i=>`<li class="analysis-item"><span class="item-icon">•</span>${i}</li>`).join('')}
-        </ul>
-        <hr class="divider">
-        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text2);">
-          🎯 <strong style="color:var(--accent)">Öneri:</strong> ${result.recommendation}
+async function analyzeListing(){
+  if(!checkKey())return;
+  const title=document.getElementById('lst-title').value.trim();
+  if(!title){toast('Başlık girin');return;}
+  loading('listing-results');
+  try{
+    const tags=document.getElementById('lst-tags').value.trim();
+    const desc=document.getElementById('lst-desc').value.trim();
+    const price=document.getElementById('lst-price').value.trim();
+    const raw=await claude(`Etsy listing SEO analizi. Başlık:"${title}" Etiketler:"${tags}" Açıklama:"${desc}" Fiyat:$${price}. Sadece JSON:{"seo_score":0-100,"title_score":0-100,"tags_score":0-100,"desc_score":0-100,"price_competitive":"Düşük/Uygun/Yüksek","improvements":["5 iyileştirme Türkçe"],"better_title":"Daha iyi başlık önerisi","missing_tags":["5 eksik tag"],"summary":"2 cümle Türkçe"}`);
+    const r=parse(raw);
+    const sc=r.seo_score>=70?'good':r.seo_score>=40?'medium':'bad';
+    document.getElementById('listing-results').innerHTML=`
+    <div class="results-card">
+      <div class="result-title">📋 Listing SEO Analizi</div>
+      <div class="score-row">
+        <div class="score-circle ${sc}"><div class="score-num">${r.seo_score}</div><div class="score-label">SEO</div></div>
+        <div style="flex:1;">
+          ${bar('📝 Başlık',r.title_score)}${bar('🏷️ Etiketler',r.tags_score)}${bar('📄 Açıklama',r.desc_score)}
+          <span class="tag ${r.price_competitive==='Uygun'?'good':r.price_competitive==='Yüksek'?'bad':'medium'}" style="margin-top:4px;display:inline-block;">💰 Fiyat: ${r.price_competitive}</span>
         </div>
       </div>
-      ${sampleListings.length > 0 ? `
-      <div class="results-card">
-        <div class="result-title">📦 Üst Listinglar</div>
-        <div class="product-grid">
-          ${sampleListings.map(l=>`
-            <div class="product-card">
-              <div class="product-name">${l.title?.substring(0,60)}${l.title?.length>60?'...':''}</div>
-              <div class="product-meta">
-                <span class="product-price">$${l.price}</span>
-                <span class="product-sales">❤️ ${l.num_favorers} favori</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>` : ''}
-    `;
-  } catch(e) {
-    showError('kw-results', e.message);
-  }
-  document.getElementById('kw-btn').disabled = false;
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">✨ Önerilen Başlık</label>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:16px;">"${r.better_title}"</div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🔑 Eksik Etiketler</label>
+      <div class="tags" style="margin-bottom:16px;">${(r.missing_tags||[]).map(k=>'<span class="tag bad">'+k+'</span>').join('')}</div>
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🚀 İyileştirme Önerileri</label>
+      <ul class="list">${(r.improvements||[]).map(i=>'<li class="list-item"><span style="color:var(--accent)">💡</span>'+i+'</li>').join('')}</ul>
+      <div class="hr"></div>
+      <div class="hl">📊 ${r.summary}</div>
+    </div>`;
+  }catch(e){err('listing-results',e.message);}
 }
 
-// ==================== LISTING SEO ANALYSIS ====================
-async function analyzeListing() {
-  if (!checkKeys()) return;
-  const title = document.getElementById('listing-title').value.trim();
-  const tags = document.getElementById('listing-tags').value.trim();
-  const desc = document.getElementById('listing-desc').value.trim();
-  const url = document.getElementById('listing-url').value.trim();
-
-  if (!title && !url) { showToast('Başlık veya URL girin'); return; }
-
-  showLoading('listing-results');
-
-  try {
-    // URL'den listing ID çıkar
-    let listingId = null;
-    if (url) {
-      const match = url.match(/listing\/(\d+)/);
-      if (match) listingId = match[1];
-    }
-
-    let etsyListing = null;
-    if (listingId) {
-      try {
-        etsyListing = await fetchEtsy(`listings/${listingId}`);
-      } catch(e) {}
-    }
-
-    const listingTitle = etsyListing?.title || title;
-    const listingTags = etsyListing?.tags?.join(', ') || tags;
-    const listingDesc = etsyListing?.description?.substring(0,300) || desc;
-
-    const prompt = `Etsy listing SEO analizi yap:
-Başlık: "${listingTitle}"
-Etiketler: "${listingTags}"
-Açıklama (ilk kısım): "${listingDesc}"
-
-JSON formatında yanıt ver:
-{
-  "seo_score": 0-100,
-  "title_score": 0-100,
-  "tags_score": 0-100,
-  "desc_score": 0-100,
-  "title_issues": ["başlıkla ilgili sorunlar, Türkçe"],
-  "tags_issues": ["etiketlerle ilgili sorunlar, Türkçe"],
-  "desc_issues": ["açıklamayla ilgili sorunlar, Türkçe"],
-  "improvements": ["5 adet iyileştirme önerisi, Türkçe"],
-  "better_title_suggestion": "Daha iyi bir başlık önerisi",
-  "missing_keywords": ["Eksik olabilecek 5 keyword"],
-  "summary": "Genel değerlendirme, 2 cümle, Türkçe"
-}`;
-
-    const raw = await askClaude(prompt);
-    let r;
-    try {
-      r = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
-    } catch(e) {
-      throw new Error('Analiz sonucu işlenemedi.');
-    }
-
-    const scoreClass = r.seo_score >= 70 ? 'good' : r.seo_score >= 40 ? 'medium' : 'bad';
-
-    document.getElementById('listing-results').innerHTML = `
-      <div class="results-card">
-        <div class="result-title">📋 Listing SEO Analizi</div>
-        <div class="score-row">
-          <div class="score-circle ${scoreClass}">
-            <div class="score-num">${r.seo_score}</div>
-            <div class="score-label">SEO Skor</div>
+async function analyzeShop(){
+  if(!checkKey())return;
+  const name=document.getElementById('sh-name').value.trim();
+  if(!name){toast('Mağaza adı girin');return;}
+  loading('shop-results');
+  try{
+    const listings=document.getElementById('sh-listings').value.trim();
+    const sales=document.getElementById('sh-sales').value.trim();
+    const rating=document.getElementById('sh-rating').value.trim();
+    const extra=document.getElementById('sh-extra').value.trim();
+    const raw=await claude(`Etsy mağaza sağlık analizi. Mağaza:"${name}" Listing:${listings||'?'} Satış:${sales||'?'} Puan:${rating||'?'} Bilgi:"${extra||'yok'}". Sadece JSON:{"health_score":0-100,"review_score":0-100,"listing_score":0-100,"sales_score":0-100,"strengths":["3-4 güçlü yön Türkçe"],"weaknesses":["3-4 zayıf yön Türkçe"],"action_items":["5 aksiyon Türkçe"],"estimated_monthly_revenue":"$X-$Y","growth_potential":"Düşük/Orta/Yüksek","summary":"2-3 cümle Türkçe"}`);
+    const r=parse(raw);
+    const sc=r.health_score>=70?'good':r.health_score>=40?'medium':'bad';
+    document.getElementById('shop-results').innerHTML=`
+    <div class="results-card">
+      <div class="result-title">🏪 "${name}" Mağaza Analizi</div>
+      <div class="score-row">
+        <div class="score-circle ${sc}"><div class="score-num">${r.health_score}</div><div class="score-label">Sağlık</div></div>
+        <div style="flex:1;">
+          ${bar('⭐ Yorumlar',r.review_score)}${bar('📦 Listinglar',r.listing_score)}${bar('💰 Satışlar',r.sales_score)}
+          <div class="tags" style="margin-top:6px;">
+            <span class="tag ${r.growth_potential==='Yüksek'?'good':r.growth_potential==='Orta'?'medium':'bad'}">📈 ${r.growth_potential} Potansiyel</span>
+            <span class="tag">💵 ${r.estimated_monthly_revenue}/ay</span>
           </div>
-          <div style="flex:1;">
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              ${[['📝 Başlık', r.title_score], ['🏷️ Etiketler', r.tags_score], ['📄 Açıklama', r.desc_score]].map(([label, score]) => `
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <span style="font-size:12px;color:var(--text2);width:80px;">${label}</span>
-                  <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-                    <div style="height:100%;width:${score}%;background:${score>=70?'var(--success)':score>=40?'var(--warning)':'var(--error)'};border-radius:3px;transition:width 0.5s;"></div>
-                  </div>
-                  <span style="font-size:12px;font-weight:600;color:${score>=70?'var(--success)':score>=40?'var(--warning)':'var(--error)'};">${score}</span>
-                </div>`).join('')}
-            </div>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:12px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">✨ Daha İyi Başlık</div>
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);margin-bottom:16px;">"${r.better_title_suggestion}"</div>
-        <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🔑 Eksik Keywordler</div>
-        <div class="tags-wrap" style="margin-bottom:16px;">
-          ${(r.missing_keywords||[]).map(k=>`<span class="tag-pill bad">${k}</span>`).join('')}
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🚀 İyileştirme Önerileri</div>
-        <ul class="analysis-list">
-          ${(r.improvements||[]).map(i=>`<li class="analysis-item"><span class="item-icon">💡</span>${i}</li>`).join('')}
-        </ul>
-        <hr class="divider">
-        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text2);">
-          📊 ${r.summary}
         </div>
       </div>
-    `;
-  } catch(e) {
-    showError('listing-results', e.message);
-  }
-}
-
-// ==================== SHOP HEALTH ANALYSIS ====================
-async function analyzeShop() {
-  if (!checkKeys()) return;
-  const shopName = document.getElementById('shop-name').value.trim();
-  if (!shopName) { showToast('Mağaza adı girin'); return; }
-
-  showLoading('shop-results');
-  document.getElementById('shop-btn').disabled = true;
-
-  try {
-    let shopData = null;
-    let listings = [];
-
-    try {
-      shopData = await fetchEtsy(`shops/${shopName}`);
-      const listingsData = await fetchEtsy(`shops/${shopName}/listings/active?limit=10`);
-      listings = listingsData.results || [];
-    } catch(e) {}
-
-    const extra = document.getElementById('shop-extra').value.trim();
-    const prompt = `Etsy mağaza sağlık analizi yap:
-Mağaza adı: "${shopName}"
-${shopData ? `
-Mağaza verisi: 
-- Review sayısı: ${shopData.review_count || 0}
-- Ortalama puan: ${shopData.review_average || 0}
-- Satış sayısı: ${shopData.transaction_sold_count || 0}
-- Favori sayısı: ${shopData.num_favorers || 0}
-- Kuruluş tarihi: ${shopData.create_date ? new Date(shopData.create_date*1000).toLocaleDateString('tr-TR') : '?'}
-- Aktif listing sayısı: ${shopData.listing_active_count || 0}
-` : 'Mağaza verisi yok, genel analiz yap.'}
-${listings.length > 0 ? `Örnek ürünler: ${listings.slice(0,5).map(l=>l.title?.substring(0,40)).join(', ')}` : ''}
-${extra ? `Ek bilgi: ${extra}` : ''}
-
-JSON formatında yanıt ver:
-{
-  "health_score": 0-100,
-  "review_score": 0-100,
-  "listing_score": 0-100,
-  "sales_score": 0-100,
-  "strengths": ["3-4 güçlü yön, Türkçe"],
-  "weaknesses": ["3-4 zayıf yön, Türkçe"],
-  "action_items": ["5 adet aksiyon maddesi, öncelik sırasına göre, Türkçe"],
-  "estimated_monthly_revenue": "$X - $Y",
-  "growth_potential": "Düşük/Orta/Yüksek",
-  "summary": "Genel değerlendirme, 2-3 cümle, Türkçe"
-}`;
-
-    const raw = await askClaude(prompt);
-    let r;
-    try {
-      r = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
-    } catch(e) {
-      throw new Error('Analiz sonucu işlenemedi.');
-    }
-
-    const scoreClass = r.health_score >= 70 ? 'good' : r.health_score >= 40 ? 'medium' : 'bad';
-
-    document.getElementById('shop-results').innerHTML = `
-      <div class="results-card">
-        <div class="result-title">🏪 "${shopName}" Mağaza Analizi</div>
-        ${shopData ? `
-        <div class="stats-grid" style="margin-bottom:20px;">
-          <div class="stat-box"><div class="stat-value">${shopData.transaction_sold_count?.toLocaleString() || '?'}</div><div class="stat-label">Toplam Satış</div></div>
-          <div class="stat-box"><div class="stat-value">${shopData.review_average || '?'}⭐</div><div class="stat-label">Ortalama Puan</div></div>
-          <div class="stat-box"><div class="stat-value">${shopData.listing_active_count || '?'}</div><div class="stat-label">Aktif Listing</div></div>
-        </div>` : ''}
-        <div class="score-row">
-          <div class="score-circle ${scoreClass}">
-            <div class="score-num">${r.health_score}</div>
-            <div class="score-label">Sağlık</div>
-          </div>
-          <div style="flex:1;">
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              ${[['⭐ Yorumlar', r.review_score], ['📦 Listinglar', r.listing_score], ['💰 Satışlar', r.sales_score]].map(([label, score]) => `
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <span style="font-size:12px;color:var(--text2);width:90px;">${label}</span>
-                  <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-                    <div style="height:100%;width:${score}%;background:${score>=70?'var(--success)':score>=40?'var(--warning)':'var(--error)'};border-radius:3px;"></div>
-                  </div>
-                  <span style="font-size:12px;font-weight:600;color:${score>=70?'var(--success)':score>=40?'var(--warning)':'var(--error)'};">${score}</span>
-                </div>`).join('')}
-            </div>
-            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-              <span class="tag-pill ${r.growth_potential==='Yüksek'?'good':r.growth_potential==='Orta'?'medium':'bad'}">📈 ${r.growth_potential} Büyüme Potansiyeli</span>
-              <span class="tag-pill">💵 ${r.estimated_monthly_revenue}/ay tahmini</span>
-            </div>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div>
-            <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--success);text-transform:uppercase;">✅ Güçlü Yönler</div>
-            <ul class="analysis-list">
-              ${(r.strengths||[]).map(i=>`<li class="analysis-item" style="color:var(--text2);"><span class="item-icon" style="color:var(--success)">✓</span>${i}</li>`).join('')}
-            </ul>
-          </div>
-          <div>
-            <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--error);text-transform:uppercase;">⚠️ Zayıf Yönler</div>
-            <ul class="analysis-list">
-              ${(r.weaknesses||[]).map(i=>`<li class="analysis-item" style="color:var(--text2);"><span class="item-icon" style="color:var(--error)">✗</span>${i}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🎯 Yapman Gerekenler</div>
-        <ul class="analysis-list">
-          ${(r.action_items||[]).map((i,idx)=>`<li class="analysis-item"><span class="item-icon" style="color:var(--accent);font-weight:700;">${idx+1}.</span>${i}</li>`).join('')}
-        </ul>
-        <hr class="divider">
-        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text2);">
-          📊 ${r.summary}
-        </div>
+      <div class="hr"></div>
+      <div class="two-col">
+        <div><label class="field-label" style="color:var(--success);display:block;margin-bottom:8px;">✅ Güçlü Yönler</label><ul class="list">${(r.strengths||[]).map(i=>'<li class="list-item"><span style="color:var(--success)">✓</span>'+i+'</li>').join('')}</ul></div>
+        <div><label class="field-label" style="color:var(--error);display:block;margin-bottom:8px;">⚠️ Zayıf Yönler</label><ul class="list">${(r.weaknesses||[]).map(i=>'<li class="list-item"><span style="color:var(--error)">✗</span>'+i+'</li>').join('')}</ul></div>
       </div>
-    `;
-  } catch(e) {
-    showError('shop-results', e.message);
-  }
-  document.getElementById('shop-btn').disabled = false;
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🎯 Yapman Gerekenler</label>
+      <ul class="list">${(r.action_items||[]).map((i,x)=>'<li class="list-item"><span style="color:var(--accent);font-weight:700;">'+(x+1)+'.</span>'+i+'</li>').join('')}</ul>
+      <div class="hr"></div>
+      <div class="hl">📊 ${r.summary}</div>
+    </div>`;
+  }catch(e){err('shop-results',e.message);}
 }
 
-// ==================== CTR ANALYSIS ====================
-async function analyzeCTR() {
-  if (!checkKeys()) return;
-  const type = document.getElementById('ctr-type').value.trim();
-  const thumb = document.getElementById('ctr-thumb').value.trim();
-  const audience = document.getElementById('ctr-audience').value.trim();
-  const competitor = document.getElementById('ctr-competitor').value.trim();
-
-  if (!type) { showToast('Ürün türü girin'); return; }
-
-  showLoading('ctr-results');
-
-  try {
-    const prompt = `Etsy CTR ve görsel optimizasyon rehberi oluştur:
-Ürün türü: "${type}"
-Mevcut thumbnail: "${thumb || 'Belirtilmedi'}"
-Hedef müşteri: "${audience || 'Genel'}"
-Rakip mağaza: "${competitor || 'Belirtilmedi'}"
-
-JSON formatında yanıt ver:
-{
-  "ctr_score": 0-100 tahmini mevcut CTR skoru,
-  "thumbnail_tips": ["5 adet thumbnail önerisi, Türkçe"],
-  "mockup_tips": ["4 adet mockup önerisi, Türkçe"],
-  "color_strategy": "Renk stratejisi önerisi, Türkçe",
-  "text_on_image": "Görsel üzerinde metin kullanımı önerisi, Türkçe",
-  "composition_tips": ["3 adet kompozisyon önerisi, Türkçe"],
-  "competitor_strategy": "Rakiplerden sıyrılma stratejisi, Türkçe",
-  "a_b_test_ideas": ["3 adet A/B test fikri, Türkçe"],
-  "quick_wins": ["3 adet hızlı kazanım, Türkçe"],
-  "ctr_potential": "Bu önerileri uygularsan beklenen CTR artışı, örn: %40-60 artış"
-}`;
-
-    const raw = await askClaude(prompt);
-    let r;
-    try {
-      r = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
-    } catch(e) {
-      throw new Error('Analiz sonucu işlenemedi.');
-    }
-
-    const scoreClass = r.ctr_score >= 70 ? 'good' : r.ctr_score >= 40 ? 'medium' : 'bad';
-
-    document.getElementById('ctr-results').innerHTML = `
-      <div class="results-card">
-        <div class="result-title">📈 CTR & Görsel Optimizasyon Rehberi</div>
-        <div class="score-row">
-          <div class="score-circle ${scoreClass}">
-            <div class="score-num">${r.ctr_score}</div>
-            <div class="score-label">CTR Skoru</div>
-          </div>
-          <div style="flex:1;">
-            <div style="background:rgba(34,197,94,0.1);border:1px solid var(--success);border-radius:8px;padding:12px 14px;">
-              <div style="font-size:11px;color:var(--success);font-weight:600;text-transform:uppercase;margin-bottom:4px;">🚀 Beklenen Artış</div>
-              <div style="font-size:18px;font-family:'Syne',sans-serif;font-weight:700;color:var(--success);">${r.ctr_potential}</div>
-            </div>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-          <div>
-            <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🖼️ Thumbnail Önerileri</div>
-            <ul class="analysis-list">
-              ${(r.thumbnail_tips||[]).map(i=>`<li class="analysis-item"><span class="item-icon">📸</span>${i}</li>`).join('')}
-            </ul>
-          </div>
-          <div>
-            <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🎨 Mockup Önerileri</div>
-            <ul class="analysis-list">
-              ${(r.mockup_tips||[]).map(i=>`<li class="analysis-item"><span class="item-icon">✨</span>${i}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">🎨 Renk Stratejisi</div>
-            <div style="font-size:13px;color:var(--text2);">${r.color_strategy}</div>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">✍️ Görsel Metin</div>
-            <div style="font-size:13px;color:var(--text2);">${r.text_on_image}</div>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">⚡ Hızlı Kazanımlar</div>
-        <ul class="analysis-list" style="margin-bottom:16px;">
-          ${(r.quick_wins||[]).map(i=>`<li class="analysis-item"><span class="item-icon" style="color:var(--accent)">⚡</span>${i}</li>`).join('')}
-        </ul>
-        <hr class="divider">
-        <div style="margin-bottom:10px;font-weight:600;font-size:12px;color:var(--text2);text-transform:uppercase;">🧪 A/B Test Fikirleri</div>
-        <ul class="analysis-list" style="margin-bottom:16px;">
-          ${(r.a_b_test_ideas||[]).map(i=>`<li class="analysis-item"><span class="item-icon">🔬</span>${i}</li>`).join('')}
-        </ul>
-        <hr class="divider">
-        <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text2);">
-          🎯 <strong style="color:var(--accent)">Rakip Stratejisi:</strong> ${r.competitor_strategy}
-        </div>
+async function analyzeCTR(){
+  if(!checkKey())return;
+  const type=document.getElementById('ct-type').value.trim();
+  if(!type){toast('Ürün türü girin');return;}
+  loading('ctr-results');
+  try{
+    const thumb=document.getElementById('ct-thumb').value.trim();
+    const audience=document.getElementById('ct-audience').value.trim();
+    const niche=document.getElementById('ct-niche').value.trim();
+    const raw=await claude(`Etsy CTR ve görsel optimizasyon rehberi. Ürün:"${type}" Thumbnail:"${thumb||'belirtilmedi'}" Kitle:"${audience||'genel'}" Niş:"${niche||'belirtilmedi'}". Sadece JSON:{"ctr_score":0-100,"thumbnail_tips":["5 thumbnail önerisi Türkçe"],"mockup_tips":["4 mockup önerisi Türkçe"],"color_strategy":"renk stratejisi Türkçe","text_on_image":"görsel metin kullanımı Türkçe","quick_wins":["3 hızlı kazanım Türkçe"],"ab_test_ideas":["3 AB test fikri Türkçe"],"ctr_potential":"beklenen artış yüzdesi"}`);
+    const r=parse(raw);
+    const sc=r.ctr_score>=70?'good':r.ctr_score>=40?'medium':'bad';
+    document.getElementById('ctr-results').innerHTML=`
+    <div class="results-card">
+      <div class="result-title">📈 CTR Optimizasyon Rehberi</div>
+      <div class="score-row">
+        <div class="score-circle ${sc}"><div class="score-num">${r.ctr_score}</div><div class="score-label">CTR</div></div>
+        <div style="flex:1;"><div style="background:rgba(34,197,94,0.1);border:1px solid var(--success);border-radius:8px;padding:12px 14px;"><div style="font-size:11px;color:var(--success);font-weight:600;text-transform:uppercase;margin-bottom:4px;">🚀 Beklenen Artış</div><div style="font-size:18px;font-family:'Syne',sans-serif;font-weight:700;color:var(--success);">${r.ctr_potential}</div></div></div>
       </div>
-    `;
-  } catch(e) {
-    showError('ctr-results', e.message);
-  }
+      <div class="hr"></div>
+      <div class="two-col">
+        <div><label class="field-label" style="display:block;margin-bottom:8px;">🖼️ Thumbnail Önerileri</label><ul class="list">${(r.thumbnail_tips||[]).map(i=>'<li class="list-item"><span>📸</span>'+i+'</li>').join('')}</ul></div>
+        <div><label class="field-label" style="display:block;margin-bottom:8px;">🎨 Mockup Önerileri</label><ul class="list">${(r.mockup_tips||[]).map(i=>'<li class="list-item"><span>✨</span>'+i+'</li>').join('')}</ul></div>
+      </div>
+      <div class="hr"></div>
+      <div class="two-col" style="margin-bottom:16px;">
+        <div class="info-box"><label class="field-label" style="display:block;margin-bottom:4px;">🎨 Renk Stratejisi</label><div style="font-size:13px;color:var(--text2);">${r.color_strategy}</div></div>
+        <div class="info-box"><label class="field-label" style="display:block;margin-bottom:4px;">✍️ Görsel Metin</label><div style="font-size:13px;color:var(--text2);">${r.text_on_image}</div></div>
+      </div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">⚡ Hızlı Kazanımlar</label>
+      <ul class="list" style="margin-bottom:16px;">${(r.quick_wins||[]).map(i=>'<li class="list-item"><span style="color:var(--accent)">⚡</span>'+i+'</li>').join('')}</ul>
+      <div class="hr"></div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🧪 A/B Test Fikirleri</label>
+      <ul class="list">${(r.ab_test_ideas||[]).map(i=>'<li class="list-item"><span>🔬</span>'+i+'</li>').join('')}</ul>
+    </div>`;
+  }catch(e){err('ctr-results',e.message);}
 }
 
-// ==================== ENTER KEY SUPPORT ====================
-document.getElementById('kw-input').addEventListener('keydown', e => { if(e.key==='Enter') analyzeKeyword(); });
-document.getElementById('shop-name').addEventListener('keydown', e => { if(e.key==='Enter') analyzeShop(); });
+async function analyzeRevenue(){
+  if(!checkKey())return;
+  const type=document.getElementById('rv-type').value.trim();
+  const price=document.getElementById('rv-price').value.trim();
+  if(!type||!price){toast('Ürün türü ve fiyat girin');return;}
+  loading('rev-results');
+  try{
+    const cost=document.getElementById('rv-cost').value.trim();
+    const sales=document.getElementById('rv-sales').value.trim();
+    const listings=document.getElementById('rv-listings').value.trim();
+    const raw=await claude(`Etsy kazanç analizi. Ürün:"${type}" Fiyat:$${price} Maliyet:$${cost||'0'} Aylık satış:${sales||'tahmin et'} Listing:${listings||'?'}. Sadece JSON:{"estimated_monthly_sales":tahmini sayı,"gross_revenue":"$X","etsy_fees":"$X","production_cost":"$X","net_revenue":"$X","profit_margin":"%X","conservative":"$X/ay","realistic":"$X/ay","optimistic":"$X/ay","growth_tips":["5 öneri Türkçe"],"price_recommendation":"fiyat önerisi Türkçe","scale_plan":["3 adım Türkçe"],"breakeven":"başabaş noktası"}`);
+    const r=parse(raw);
+    document.getElementById('rev-results').innerHTML=`
+    <div class="results-card">
+      <div class="result-title">💰 Kazanç Analizi</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-value">${r.estimated_monthly_sales}</div><div class="stat-label">Tahmini Aylık Satış</div></div>
+        <div class="stat-box"><div class="stat-value" style="color:var(--success)">${r.net_revenue}</div><div class="stat-label">Net Kazanç/Ay</div></div>
+        <div class="stat-box"><div class="stat-value">${r.profit_margin}</div><div class="stat-label">Kâr Marjı</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+        <div class="info-box" style="text-align:center;"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Muhafazakâr</div><div style="font-size:16px;font-weight:700;color:var(--text2);">${r.conservative}</div></div>
+        <div class="info-box" style="text-align:center;border-color:var(--accent);"><div style="font-size:11px;color:var(--accent);margin-bottom:4px;">Gerçekçi ⭐</div><div style="font-size:16px;font-weight:700;color:var(--accent);">${r.realistic}</div></div>
+        <div class="info-box" style="text-align:center;border-color:var(--success);"><div style="font-size:11px;color:var(--success);margin-bottom:4px;">İyimser</div><div style="font-size:16px;font-weight:700;color:var(--success);">${r.optimistic}</div></div>
+      </div>
+      <div class="hr"></div>
+      <div class="two-col" style="margin-bottom:16px;">
+        <div class="info-box"><label class="field-label" style="display:block;margin-bottom:4px;">Etsy Komisyonu</label><div style="color:var(--error);font-weight:600;">${r.etsy_fees}</div></div>
+        <div class="info-box"><label class="field-label" style="display:block;margin-bottom:4px;">Başabaş Noktası</label><div style="color:var(--warning);font-weight:600;font-size:12px;">${r.breakeven}</div></div>
+      </div>
+      <label class="field-label" style="display:block;margin-bottom:8px;">📈 Kazanç Artırma Önerileri</label>
+      <ul class="list" style="margin-bottom:16px;">${(r.growth_tips||[]).map(i=>'<li class="list-item"><span style="color:var(--accent)">💡</span>'+i+'</li>').join('')}</ul>
+      <label class="field-label" style="display:block;margin-bottom:8px;">🚀 Ölçeklendirme Planı</label>
+      <ul class="list" style="margin-bottom:16px;">${(r.scale_plan||[]).map((i,x)=>'<li class="list-item"><span style="color:var(--accent);font-weight:700;">'+(x+1)+'.</span>'+i+'</li>').join('')}</ul>
+      <div class="hr"></div>
+      <div class="hl">💰 <strong style="color:var(--accent)">Fiyat Önerisi:</strong> ${r.price_recommendation}</div>
+    </div>`;
+  }catch(e){err('rev-results',e.message);}
+}
 
-// ==================== INIT ====================
-window.addEventListener('load', () => {
-  if (!localStorage.getItem('gleza_claude_key')) {
-    setTimeout(openSettings, 500);
-  }
-});
+document.getElementById('kw-input').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeKeyword();});
+document.getElementById('sh-name').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeShop();});
+window.addEventListener('load',()=>{if(!localStorage.getItem('gleza_k'))setTimeout(openSettings,500);});
 </script>
 </body>
 </html>
